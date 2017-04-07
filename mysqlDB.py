@@ -19,38 +19,17 @@
 # "9999-12-31 23:59:59", "9999-12-31 23:59:59");
 # select * from articles;
 
+import pymysql
 
-import pymysql as mq
-import time
+# MySQL Connection 연결
+conn = pymysql.connect(host='localhost', user='root', password='1234',
+                       db='robotjournalism', charset='utf8')
 
-while 1:
-    print
-    "db start"
-    db = mq.connect("localhost", "pusan", "pusanpass", "pusandb")
-    cursor = db.cursor()
+# Connection 으로부터 Cursor 생성
+curs = conn.cursor()
 
-    cursor.execute("select distinct id from sensor_table")
-    ret = cursor.fetchall()
-    for tup in list(ret):
-        id = list(tup)[0]
+sql = "select * from articles"
+curs.execute(sql)
 
-        cursor.execute("select floor(avg(temperature)) from sensor_table where id=" + str(id))
-        data = cursor.fetchone()
-
-        cursor.execute("select temperature from sensor_table where id=" + str(id) + " order by time DESC limit 1 ")
-        realData = cursor.fetchone()
-
-        cursor.execute("select time from sensor_table where id=" + str(id) + " order by time DESC limit 1 ")
-        date = cursor.fetchone()
-
-        # print "insert into predictionVal values( 0, " + str(id) +", "+ str(int(result)) +" , '" + dateTime +"')"
-        # cursor.execute(
-        #     "insert into predictionVal values( 0, " + str(id) + ", " + str(int(result)) + " , '" + dateTime + "')")
-        db.commit()
-
-    time.sleep(5.00)
-    print
-    "server sleeping ..."
-    db.close()
-    print
-    "db close"
+rows = curs.fetchall()
+print(rows)  # 전체 rows
