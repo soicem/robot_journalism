@@ -54,6 +54,7 @@ class mysqlDB:
         print(sql)
         self.curs.execute(sql)
         self.conn.commit()
+
     def printData(self):
         sql = "select * from articles"
         self.curs.execute(sql)
