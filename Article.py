@@ -41,22 +41,21 @@ class Article():
                 articleList = bsObj.findAll("div", {"class": "text"})
                 titles = bsObj.findAll("span", {"class": "title"})
                 published_times = bsObj.find_all('meta', attrs={'property':'article:published_time'})
-                
+
                 article_result = ""
                 title = ""
                 p_time = ""
-                
+
                 bool_title = 0
-                
+
                 for buf in titles:
-                    # print(title.get_text())
                     title = buf.get_text()
                     bool_title = title.count(self.keyword) if True else False
                 if bool_title:
                     for published_time in published_times:
                         re_date = re.compile(r'(\d{1,4}[/-]\d{1,2}[/-]\d{1,2}[T]\d{1,2}[/:]\d{1,2}[/:]\d{1,2}[+]\d{1,2}[/-:]\d{1,2})')
                         p_time = re_date.findall(str(published_time))
-    
+
                     for name in articleList:  article_result += name.getText().strip().replace("\n", "").replace('"', "/")
                     if (title is not ""):
                         p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]

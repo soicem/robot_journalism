@@ -51,7 +51,7 @@ class mysqlDB:
               '"' + articleUrl +'",' + \
               '"' + published_time + '",' + \
               '"' + s + '");'
-        print(sql)
+        # print(sql)
         self.curs.execute(sql)
         self.conn.commit()
 
