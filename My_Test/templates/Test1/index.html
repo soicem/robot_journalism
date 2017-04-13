@@ -1,0 +1,28 @@
+
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <title>Test</title>
+    {% load staticfiles %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{%  static 'Test1.css' %}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div  margin : auto  align="center" >
+<table width="300px" height="300px" background={% static 'img/flower.png' %} >
+<tbody>
+{% for card_text in card_texts %}
+<tr>
+    <td >{{ card_text.introduction }}</td>
+
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</body>
+</html>
