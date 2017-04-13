@@ -8,8 +8,10 @@ import mysqlDB
 
 
 class Article():
-    def __init__(self, tendency):
+    def __init__(self, tendency, keyword):
         self.mq = mysqlDB.mysqlDB()
+
+        self.keyword = keyword # specific keyword related to politic
         self.tendency = tendency
         self.progressive = ["한겨례", "경향신문", "오마이뉴스"]
         self.progressivismTargets = {
@@ -24,6 +26,8 @@ class Article():
         self.conservative = []
         self.conservatismTargets = {}
 
+        self.visitedUrl = []
+
         random.seed(datetime.datetime.now())
 
 
@@ -34,22 +38,28 @@ class Article():
             bsObj = BeautifulSoup(html, "html.parser")
 
             if i == 0: # 0 : 한겨례
-                nameList = bsObj.findAll("div", {"class": "text"})
+                articleList = bsObj.findAll("div", {"class": "text"})
                 titles = bsObj.findAll("span", {"class": "title"})
                 published_times = bsObj.find_all('meta', attrs={'property':'article:published_time'})
+                
                 article_result = ""
                 title = ""
+                p_time = ""
+                
+                bool_title = 0
+                
                 for buf in titles:
                     title = buf.get_text()
-                p_time = ""
-                for published_time in published_times:
-                    p_date = re.compile(r'(\d{1,4}[/-]\d{1,2}[/-]\d{1,2}[T]\d{1,2}[/:]\d{1,2}[/:]\d{1,2}[+]\d{1,2}[/-:]\d{1,2})')
-                    p_time = p_date.findall(str(published_time))
-
-                for name in nameList:  article_result += name.getText().strip().replace("\n", "")
-                if (title is not ""):
-                    p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]
-                    self.mq.insert_data(str(1), title, "한겨례", article_result, url, p_time)
+                    bool_title = title.count(self.keyword) if True else False
+                if bool_title:
+                    for published_time in published_times:
+                        re_date = re.compile(r'(\d{1,4}[/-]\d{1,2}[/-]\d{1,2}[T]\d{1,2}[/:]\d{1,2}[/:]\d{1,2}[+]\d{1,2}[/-:]\d{1,2})')
+                        p_time = re_date.findall(str(published_time))
+    
+                    for name in articleList:  article_result += name.getText().strip().replace("\n", "").replace('"', "/")
+                    if (title is not ""):
+                        p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]
+                        self.mq.insert_data(str(1), title, "한겨례", article_result, url, p_time)
 
                 return bsObj.find().findAll("a", href=re.compile("^(/arti/politics/)((?!:).)*$"))
 
@@ -102,6 +112,7 @@ class Article():
                 return bsObj.find().findAll("a", href=re.compile("^(/NWS_Web/View/at_pg.aspx[/?])((?!mini).)*$"))
 
         if self.tendency == "progressivism":
+
             links1 = getLinks(self.progressiveArticle[self.progressive[0]], 0)
             for i in range(10):
                  newArticle1 = links1[random.randint(0, len(links1) - 1)].attrs["href"]
@@ -116,6 +127,11 @@ class Article():
             for i in range(2):
                  newArticle3 = links3[random.randint(0, len(links3) - 1)].attrs["href"]
                  links3 = getLinks(newArticle3, 2)
+
+
+        elif self.status == "conservatism":
+            pass
+
 
         # elif self.status == "conservatism":
         #     pass
