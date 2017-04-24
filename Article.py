@@ -115,6 +115,7 @@ class Article():
                 return link_list
 
         if self.tendency == "progressivism":
+
             links1 = getLinks(self.progressiveArticle[self.progressive[0]], 0)
             links2 = getLinks(self.progressiveArticle[self.progressive[1]], 1)
             links3 = getLinks(self.progressiveArticle[self.progressive[2]], 2)
