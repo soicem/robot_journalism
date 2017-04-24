@@ -26,7 +26,6 @@ class Article():
 
         random.seed(datetime.datetime.now())
 
-
     def gathering(self):
         def getLinks(articleUrl, i):
             url = self.progressivismTargets[self.progressive[i]] + articleUrl
