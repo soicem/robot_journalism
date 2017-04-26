@@ -30,10 +30,10 @@ class mysqlDB:
 
     def mysql_init(self):
         # MySQL Connection 연결
-        self.conn = pymysql.connect(host='localhost', user='root', password='1234',
-                                db='robotjournalism', charset='utf8')
+        # self.conn = pymysql.connect(host='localhost', user='root', password='1234',
+        #                         db='robotjournalism', charset='utf8')
 
-        # self.conn = pymysql.connect(host='localhost', user='root', passwd='cnsl', db='robotjournarism', charset='utf8')
+        self.conn = pymysql.connect(host='localhost', user='root', passwd='cnsl', db='robotjournarism', charset='utf8')
 
         # Connection 으로부터 Cursor 생성
         self.curs = self.conn.cursor()
