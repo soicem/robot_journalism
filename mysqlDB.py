@@ -1,6 +1,6 @@
 #!/usr/bin/env python -W ignore::DeprecationWarning
 
-# - MySQL robotjournarism database table query
+# - MySQL robotjournalism database table query
 # use robotjournalism;
 #
 # DROP TABLE IF EXISTS articles;
@@ -30,8 +30,12 @@ class mysqlDB:
 
     def mysql_init(self):
         # MySQL Connection 연결
-        self.conn = pymysql.connect(host='localhost', user='root', password='1234',
-                               db='robotjournalism', charset='utf8')
+        # self.conn = pymysql.connect(host='localhost', user='root', password='1234',
+        #                         db='robotjournalism', charset='utf8')
+
+        self.conn = pymysql.connect(host='localhost', user='root', passwd='1234', db='robotjournalism', charset='utf8')
+        #robotjournalism
+
         # Connection 으로부터 Cursor 생성
         self.curs = self.conn.cursor()
 
@@ -42,17 +46,19 @@ class mysqlDB:
     def insert_data(self, tendency, title, target, article, articleUrl, published_time):
         now = time.localtime()
         s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-        print(title)
-        sql = "insert into articles values(null , "+ \
-              tendency +',' \
-              '"' + title + '",' + \
-              '"' + target + '",' + \
-              '"' + article +'",' + \
-              '"' + articleUrl +'",' + \
-              '"' + published_time + '",' + \
-              '"' + s + '");'
+        # print(title)
+        # sql = "insert into articles values(null , "+ \
+        #       tendency +',' \
+        #       '"' + title + '",' + \
+        #       '"' + target + '",' + \
+        #       '"' + article +'",' + \
+        #       '"' + articleUrl +'",' + \
+        #       '"' + published_time + '",' + \
+        #       '"' + s + '");'
         # print(sql)
-        self.curs.execute(sql)
+
+        sql = "insert into articles values(null,%s,%s,%s,%s,%s,%s,%s)" #위 sql문 오류나서
+        self.curs.execute(sql,(tendency, title, target, article, articleUrl, published_time,s))
         self.conn.commit()
 
     def printData(self):
