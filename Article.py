@@ -104,10 +104,7 @@ class Article():
                     article_result += name.getText().strip().replace("\n", "")
                     print("!")
                     print(article_result)
-                    # print("article_result =", article_result)
 
-                # if (title is not ""):
-                #     self.mq.insert_data(str(1), title, "경향신문", article_result, url, p_time)
 
                 return bsObj.find().findAll("a", href=re.compile("^(/NWS_Web/View/at_pg.aspx[/?])((?!mini).)*$"))
 
