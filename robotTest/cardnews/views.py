@@ -54,7 +54,7 @@ def clientSocket(dataSet):
     keyword, tendency = dataSet
     msg = keyword + ',' + tendency
 
-    s.send(msg.encode('ascii'))
+    s.send(msg.encode('utf8'))
     # s.send(msg)
 
     s.close()

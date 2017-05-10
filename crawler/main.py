@@ -1,4 +1,4 @@
-import Article
+from crawler.Article import *
 import asyncio
 import socket
 
@@ -6,7 +6,7 @@ from example_code.clockdeco_param import clock
 
 @clock('{name}({args}) dt={elapsed:0.3f}s')
 def main(tendency,keyword):
-    ar2 = Article.Article(tendency, keyword)
+    ar2 = Article(tendency, keyword)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ar2.gathering(loop))
 
@@ -33,7 +33,7 @@ def getTendency_Keyword():
     msg = clientsocket.recv(1024)
     print("soicem")
     #msg = str(msg.decode('unicode'), 'utf-8')
-    result = msg.decode('ascii').split(',')
+    result = msg.decode('utf8').split(',')
     # result = msg.split(',')
     print("Got a connection from %s" % str(addr))
 
@@ -44,8 +44,6 @@ if __name__=="__main__":
     result = getTendency_Keyword()
     keyword, tendency = result
     print(result)
-    # tendency = input("tendency : ")
-    # keyword = input("keyword : ")
-    # main(tendency,keyword)
+    main(tendency,keyword)
 
 
