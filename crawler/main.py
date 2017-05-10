@@ -1,4 +1,4 @@
-import Article
+from crawler.Article import *
 import asyncio
 
 from example_code.clockdeco_param import clock

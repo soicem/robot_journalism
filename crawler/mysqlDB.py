@@ -61,12 +61,11 @@ class mysqlDB:
         self.curs.execute(sql,(tendency, title, target, article, articleUrl, published_time,s))
         self.conn.commit()
 
-    def printData(self):
-        sql = "select * from articles"
+    def getAllData(self):
+        sql = "select article from articles where _id=1; "
         self.curs.execute(sql)
         rows = self.curs.fetchall()
-        for row in rows:
-            print(row)
+        return rows
 
 
 

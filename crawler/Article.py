@@ -5,11 +5,11 @@ import random
 import re
 import aiohttp
 
-import mysqlDB
+from crawler.mysqlDB import *
 
 class Article():
     def __init__(self, tendency, keyword):
-        self.mq = mysqlDB.mysqlDB()
+        self.mq = mysqlDB()
         self.tendency = tendency
         self.keyword = keyword
         self.progressive = ["한겨례", "경향신문", "오마이뉴스"]
