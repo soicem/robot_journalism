@@ -33,7 +33,7 @@ class mysqlDB:
         # self.conn = pymysql.connect(host='localhost', user='root', password='1234',
         #                         db='robotjournalism', charset='utf8')
 
-        self.conn = pymysql.connect(host='localhost', user='root', passwd='1234', db='robotjournalism', charset='utf8')
+        self.conn = pymysql.connect(host='localhost', user='root', passwd='1234', db='a', charset='utf8')
         #robotjournalism
 
         # Connection 으로부터 Cursor 생성
@@ -57,7 +57,7 @@ class mysqlDB:
         #       '"' + s + '");'
         # print(sql)
 
-        sql = "insert into articles values(null,%s,%s,%s,%s,%s,%s,%s)" #위 sql문 오류나서
+        sql = "insert into cardnews_cardnews values(null,%s,%s,%s,%s,%s,%s,%s)" #위 sql문 오류나서
         self.curs.execute(sql,(tendency, title, target, article, articleUrl, published_time,s))
         self.conn.commit()
 
