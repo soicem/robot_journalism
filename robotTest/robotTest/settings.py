@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'robotTest.wsgi.application'
 DATABASES = {
 'default' : {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'a',
+        'NAME': 'robotjournalism',
         'USER': 'root',
         'PASSWORD': '1234',
         'HOST': 'localhost',

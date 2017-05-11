@@ -27,15 +27,15 @@ def a(request):
             keyword = form.cleaned_data['keyword']
             tendency = form.cleaned_data['tendency']
             dataSet = (keyword, tendency)
-            print(dataSet)
+
             clientSocket(dataSet)
-            return HttpResponseRedirect('')
+            return HttpResponseRedirect('cardnews/a.html')
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = NameForm()
 
-    return render(request, '/', {'form': form})
+    return render(request, 'cardnews/a.html', {'form': form})
 
 def clientSocket(dataSet):
     # create a socket object
