@@ -28,8 +28,9 @@ def a(request):
             tendency = form.cleaned_data['tendency']
             dataSet = (keyword, tendency)
 
-            clientSocket(dataSet)
-            return HttpResponseRedirect('cardnews/a.html')
+            clientSocketSendData(dataSet)
+            # return HttpResponseRedirect('cardnews/a.html')
+            return render(request, 'cardnews/a.html', {'form': form})
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -37,27 +38,23 @@ def a(request):
 
     return render(request, 'cardnews/a.html', {'form': form})
 
-def clientSocket(dataSet):
+def clientSocketSendData(dataSet):
     # create a socket object
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        # get local machine name
+        host = socket.gethostname()
+        port = 8090
 
-    # get local machine name
-    host = socket.gethostname()
+        # connection to hostname on the port.
+        s.connect((host, port))
 
-    port = 8090
+        # Receive no more than 1024 bytes
+        # msg = 'Thank you for' + "\r\n"
+        keyword, tendency = dataSet
+        msg = keyword + ',' + tendency
 
-    # connection to hostname on the port.
-    s.connect((host, port))
+        s.send(msg.encode('utf8'))
 
-    # Receive no more than 1024 bytes
-    # msg = 'Thank you for' + "\r\n"
-    keyword, tendency = dataSet
-    msg = keyword + ',' + tendency
-
-    s.send(msg.encode('utf8'))
-    # s.send(msg)
-
-    s.close()
 
 
 

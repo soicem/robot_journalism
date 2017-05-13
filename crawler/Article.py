@@ -8,7 +8,7 @@ import aiohttp
 from crawler.mysqlDB import *
 
 class Article():
-    def __init__(self, tendency, keyword):
+    def __init__(self, keyword, tendency):
         self.mq = mysqlDB()
         self.tendency = tendency
         self.keyword = keyword
@@ -62,7 +62,7 @@ class Article():
 
                 if (title is not "") :
                     p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]
-                    self.mq.insertDataIntoArticles(str(1), self.keyword, title, "한겨례", article_result, url, p_time)
+                    self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "한겨례", article_result, url, p_time)
 
             elif articleUrl.find("khan_art_view") > -1:
                 i=1
@@ -83,7 +83,7 @@ class Article():
                 for name in nameList:  article_result += name.getText().strip().replace("\n", "")
 
                 if (title is not ""):
-                    self.mq.insertDataIntoArticles(str(1), self.keyword, title, "경향신문", article_result, url, p_time)
+                    self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "경향신문", article_result, url, p_time)
 
             elif articleUrl.find("/NWS_Web/View") > -1:
                 i=2
@@ -106,7 +106,7 @@ class Article():
                     p_time = published_times.get_text()[:14]
 
                 if (title is not ""):
-                    self.mq.insertDataIntoArticles(str(1), self.keyword, title, "오마이뉴스", article_result, url, p_time)
+                    self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "오마이뉴스", article_result, url, p_time)
 
         async def getLinks(articleUrl, i):
             async with aiohttp.ClientSession() as client:

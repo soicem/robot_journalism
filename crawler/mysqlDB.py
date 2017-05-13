@@ -7,7 +7,7 @@
 #
 # create table articles (
 # 	_id int not null auto_increment primary key,
-#     tendency int not null,
+#     tendency varchar(20) not null,
 #     keyword varchar(20) not null,
 #     title varchar(100),
 #     target varchar(30) not null,
@@ -16,20 +16,30 @@
 #     publish_time datetime,
 #     collecting_time datetime
 # );
-
-# insert into articles values(null , 1, "쿵짝쿵짝 도천 천곡", "한겨례", "best in the world", "knq1130@naver.com","9999-12-31 23:59:59", "9999-12-31 23:59:59");
-# select * from articles;
-
+#
+#
 # use robotjournalism;
 #
 # DROP TABLE IF EXISTS summarizedArticles;
 #
 # create table summarizedArticles (
 # 	  _id int not null auto_increment primary key,
-#     tendency int not null,
+#     tendency varchar(20) not null,
 #     keyword varchar(20) not null,
 #     summurizedArticle TEXT,
 #     generatedtime datetime
+# );
+#
+#
+# use robotjournalism;
+#
+# DROP TABLE IF EXISTS errorLogTable;
+#
+# create table errorLogTable (
+# 	  _id int not null auto_increment primary key,
+#     errorCategorize varchar(20) not null,
+#     errorType varchar(20) not null,
+#     occuredtime datetime
 # );
 
 import pymysql
@@ -39,6 +49,7 @@ class mysqlDB:
     def __init__(self):
         self.conn = None
         self.curs = None
+        self.datatimeFormat = "%04d-%02d-%02d %02d:%02d:%02d"
         self.mysql_init()
 
     def mysql_init(self):
@@ -58,7 +69,7 @@ class mysqlDB:
 
     def insertDataIntoArticles(self, tendency, keyword, title, target, article, articleUrl, published_time):
         now = time.localtime()
-        s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+        s = self.datatimeFormat  % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
         sql = "insert into articles values(null,%s,%s,%s,%s,%s,%s,%s,%s)" #위 sql문 오류나서
         self.curs.execute(sql,(tendency, keyword, title, target, article, articleUrl, published_time,s))
@@ -66,21 +77,23 @@ class mysqlDB:
 
     def insertDataIntoSummarizedArticles(self, tendency, keyword, summerizedArticle):
         now = time.localtime()
-        s = "%04d-%02d-%02d %02d:%02d:%02d" % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
+        s = self.datatimeFormat % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
 
         sql = "insert into summarizedArticles values(null,%s,%s,%s,%s);"
-        self.curs.execute(sql,(0, keyword, summerizedArticle, s))
+        self.curs.execute(sql,(tendency, keyword, summerizedArticle, s))
         self.conn.commit()
 
-    def getAllData(self):
-        sql = "select article from articles where _id=1; "
-        self.curs.execute(sql)
-        rows = self.curs.fetchall()
-        return rows
+    # def getAllData(self):
+    #     sql = "select article from articles where _id=1; "
+    #     self.curs.execute(sql)
+    #     rows = self.curs.fetchall()
+    #     return rows
 
-    def getTitleData(self, keyword, conditionTime):
-        sql = "select title from articles where keyword = %s and collecting_time > %s;"
-        self.curs.execute(sql, (keyword,conditionTime))
+    def getTitleData(self, keyword, tendency):
+        now = time.localtime()
+        conditionTime = self.datatimeFormat % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour - 1, now.tm_min, now.tm_sec)
+        sql = "select title from articles where keyword = %s and tendency=%s and collecting_time > %s;"
+        self.curs.execute(sql, (keyword, tendency, conditionTime))
         rows = self.curs.fetchall()
         return rows
 

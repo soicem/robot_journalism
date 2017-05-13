@@ -27,7 +27,7 @@ def wait_with_progress(coros):
         yield from f
 
 @asyncio.coroutine
-def start(loop, articleUrl):
+def start(articleUrl):
     links = yield from getLinks(articleUrl)
     for _ in range(20):
         newArticle = links[random.randint(0, len(links) - 1)].attrs["href"]
@@ -39,7 +39,7 @@ def main(count):
     for _ in range(count):
         targets = ['/wiki/Marine_Le_Pen', '/wiki/Main_Page', '/wiki/Library_of_Congress_Classification']
         loop = asyncio.get_event_loop()
-        f = asyncio.wait([start(loop, target) for target in targets])
+        f = asyncio.wait([start(target) for target in targets])
         loop.run_until_complete(f)
 
 if __name__ == '__main__':
