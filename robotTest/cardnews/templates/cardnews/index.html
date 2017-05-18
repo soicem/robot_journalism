@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test용</title>
+</head>
+<body>
+<div >
+    <div>
+        <form action="a/" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {{ form }}
+            <label for="keyword">keyword: </label>
+            <input id="keyword" type="text" name="keyword" value="{{ current_keyword }}">
+            <label for="tendency">tendency: </label>
+            <input id="tendency" type="text" name="tendency" value="{{ current_tendency }}">
+            <input type="submit" value="OK">
+        </form>
+    </div>
+
+    <table align="center">
+        <thead>
+        <tr align="center">
+            <td><B>id</B></td>
+            <td><B>tendency</B></td>
+            <td><B>title</B></td>
+            <td><B>target</B></td>
+            <td><B>article</B></td>
+            <td><B>articleUrl</B></td>
+            <td><B>publish_time</B></td>
+            <td><B>collecting_time</B></td>
+        </tr>
+
+
+        </thead>
+        <tbody>
+        {%for newsdata in news_datas %}
+        <tr align="center">
+            <td>{{newsdata.id}}</td>
+            <td>{{newsdata.tendency}}</td>
+            <td>{{newsdata.title}}</td>
+            <td>{{newsdata.target}}</td>
+            <td>{{newsdata.article}}</td>
+            <td>{{newsdata.articleUrl}}</td>
+            <td>  {{newsdata.publish_time}}   </td>
+            <td>  {{newsdata.collecting_time}}  </td>
+        </tr>
+        {% endfor %}
+        <tbody>
+    </table>
+</div>
+</body>
+</html>
