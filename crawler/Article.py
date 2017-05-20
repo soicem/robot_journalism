@@ -1,4 +1,4 @@
-from urllib.request import urlopen
+# from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import datetime
 import random
@@ -22,10 +22,12 @@ class Article():
             self.progressive[1]: "/kh_politics/", #추가
             self.progressive[2]: "/NWS_Web/ArticlePage/Total_Article.aspx?PAGE_CD=C0400" #추가
         }
+
+        self.url_list=[]
         self.conservative = ["동아일보", "중앙일보", "조선일보"]
         self.conservatismTargets = {
             self.conservative[0]: "http://news.donga.com/",
-            self.conservative[1]: "http://news.joins.com/",
+            self.conservative[1]: "http://news.joins.com",
             self.conservative[2]: "http://www.chosun.com/"
         }
         self.conservativeArticle = {
@@ -34,27 +36,32 @@ class Article():
             self.conservative[2]: "/politics/"
         }
 
-        self.url_list=[]
-
-        self.conservative = []
-        self.conservatismTargets = {}
-
         random.seed(datetime.datetime.now())
 
     async def fetch(self,client, articleUrl,i):
-        url  = self.progressivismTargets[self.progressive[i]] + articleUrl
-        async with client.get(url) as resp:
-            assert resp.status == 200
-            return await resp.text()
+        if self.tendency == "progressivism":
+            url = self.progressivismTargets[self.progressive[i]] + articleUrl
+
+            async with client.get(url) as resp:
+                # print("url",url)
+                assert resp.status == 200
+                # print(resp.text())
+                return await resp.text()
+
+        elif self.tendency == "conservatism":
+            url = self.conservatismTargets[self.conservative[i]] + articleUrl
+            print("url", url)
+            print("i",i)
+            async with client.get(url) as resp:
+                assert resp.status == 200
+                return await resp.text()
 
     async def gathering(self,loop):
-        async def getInfo(articleUrl):
+        async def getInfo(articleUrl,html):
+            bsObj = BeautifulSoup(html, "html.parser")
             if self.tendency == "progressivism":
                 if articleUrl.find("/arti/politics/") > -1:
-                    i = 0
-                    url = self.progressivismTargets[self.progressive[i]] + articleUrl
-                    html = urlopen(url)
-                    bsObj = BeautifulSoup(html, "html.parser")
+                    url = self.progressivismTargets["한겨례"]+articleUrl
                     nameList = bsObj.findAll("div", {"class": "text"})
                     titles = bsObj.findAll("span", {"class": "title"})
                     published_times = bsObj.find_all('meta', attrs={'property': 'article:published_time'})
@@ -74,13 +81,10 @@ class Article():
 
                     if (title is not ""):
                         p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]
-                        self.mq.insert_data(str(1), title, "한겨례", article_result, url, p_time)
+                        self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "한겨례", article_result, url, p_time)
 
                 elif articleUrl.find("khan_art_view") > -1:
-                    i = 1
-                    url = self.progressivismTargets[self.progressive[i]] + articleUrl
-                    html = urlopen(url)
-                    bsObj = BeautifulSoup(html, "html.parser")
+                    url = self.progressivismTargets["경향신문"] + articleUrl
                     nameList = bsObj.findAll("p", {"class": "content_text"})
                     titles = bsObj.findAll("h1", {"id": "article_title"})
                     published_time = bsObj.find('em').get_text()
@@ -95,13 +99,10 @@ class Article():
                     for name in nameList:  article_result += name.getText().strip().replace("\n", "")
 
                     if (title is not ""):
-                        self.mq.insert_data(str(1), title, "경향신문", article_result, url, p_time)
+                        self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "경향신문", article_result, url, p_time)
 
                 elif articleUrl.find("/NWS_Web/View") > -1:
-                    i = 2
-                    url = self.progressivismTargets[self.progressive[i]] + articleUrl
-                    html = urlopen(url)
-                    bsObj = BeautifulSoup(html, "html.parser")
+                    url = self.progressivismTargets["오마이뉴스"] + articleUrl
                     nameList = bsObj.findAll("div", {"class": "at_contents"})
                     article_result = ''
                     p_time = ''
@@ -118,14 +119,12 @@ class Article():
                         p_time = published_times.get_text()[:14]
 
                     if (title is not ""):
-                        self.mq.insert_data(str(1), title, "오마이뉴스", article_result, url, p_time)
+                        self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "오마이뉴스", article_result, url, p_time)
 
             elif self.tendency == "conservatism":
-                if articleUrl.find("donga") > -1:
-                    i = 0
+                if articleUrl.find("Politics") > -1:
+                    print("!")
                     url = articleUrl
-                    html = urlopen(url)
-                    bsObj = BeautifulSoup(html, "html.parser")
                     nameList = bsObj.findAll("div", {"class": "article_txt"})
                     article_result = ""
                     p_time = ""
@@ -142,13 +141,11 @@ class Article():
 
                     if (title is not ""):
                         p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]
-                        self.mq.insert_data(str(2), title, "동아일보", article_result, url, p_time)
+                        self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "동아일보", article_result, url,
+                                                        p_time)
 
                 if articleUrl.find("/article/") > -1:
-                    i = 1
-                    url = self.conservatismTargets[self.conservative[i]] + articleUrl
-                    html = urlopen(url)
-                    bsObj = BeautifulSoup(html, "html.parser")
+                    url = self.conservatismTargets["중앙일보"] + articleUrl
                     nameList = bsObj.findAll("div", {"id": "article_body"})
                     article_result = ""
                     p_time = ""
@@ -156,7 +153,6 @@ class Article():
                     for name in nameList:  article_result += name.getText().strip().replace("\n", "")
 
                     title = bsObj.find("title").get_text()
-
 
                     published_times = bsObj.find_all('meta', attrs={'property': 'article:published_time'})
                     for published_time in published_times:
@@ -166,13 +162,11 @@ class Article():
 
                     if (title is not ""):
                         p_time = (p_time[0])[0:10] + " " + (p_time[0])[11:19]
-                        self.mq.insert_data(str(2), title, "중앙일보", article_result, url, p_time)
+                        self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "중앙일보", article_result, url,
+                                                       p_time)
 
-                if articleUrl.find("/news.chosun.com/") > -1:
-                    i = 2
-                    url =  articleUrl
-                    html = urlopen(url)
-                    bsObj = BeautifulSoup(html, "html.parser")
+                if articleUrl.find("/site") > -1:
+                    url = self.conservatismTargets["조선일보"] + articleUrl
                     nameList = bsObj.findAll("div", {"class": "par"})
                     article_result = ""
 
@@ -182,15 +176,23 @@ class Article():
                     p_time = bsObj.find('div', attrs={'class': 'news_date'}).get_text().strip()[5:21]
 
                     if (title is not ""):
-                        self.mq.insert_data(str(2), title, "조선일보", article_result, url, p_time)
+                        # print("time",p_time)
+                        self.mq.insertDataIntoArticles(self.tendency, self.keyword, title, "조선일보", article_result, url,
+                                                       p_time)
 
         async def getLinks(articleUrl, i):
-            async with aiohttp.ClientSession() as client:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            }
+            async with aiohttp.ClientSession(headers=headers) as client:
                 url = await self.fetch(client, articleUrl,i)
+                # print("link",url)
                 bsObj = BeautifulSoup(url, "html.parser")
 
             link_list = set() #같은 주소 제거 오마이뉴스는 링크다른데 중복기사 있음
-            if self.tendency == "progressivism":
+
+            if self.tendency == "progressivism" :
                 if i == 0:  # 0 : 한겨례
                     han_links = bsObj.findAll("a", href=re.compile("^(/arti/politics/)((?!:).)*$"))
                     for link in han_links:
@@ -214,40 +216,76 @@ class Article():
                             link_list.add(link)
 
             if self.tendency == "conservatism":
+
                 if i == 0 : # 동아일보
-                    donga_links = bsObj.findAll("a",href=re.compile("news.donga.com/Politics/3/00"))
+                    donga_links = bsObj.findAll("a",href=re.compile("news.donga.com/Politics/3/00/"))
                     for link in donga_links:
                         if link.get_text().find(self.keyword) > -1:
-                            link = link.get('href')
+                            link = link.get('href')[22:]
+                            # print("동아일보", link)
                             link_list.add(link)
+
                 elif i == 1 : # 중앙일보
                     joongang_links = bsObj.findAll("a", href=re.compile("^(/article/)"))
                     for link in joongang_links:
                         if link.get_text().find(self.keyword) > -1:
                             link = link.get('href')
+                            # print("중앙일보", link)
                             link_list.add(link)
                 elif i == 2 : # 조선일보
                     chosun_links = bsObj.findAll("a", href=re.compile("^(http://news.chosun.com/site/data/html_dir/)"))
                     for link in chosun_links:
                         if link.get_text().find(self.keyword) > -1:
-                            link = link.get('href')
+                            link = link.get('href')[22:]
+                            # print("조선일보", link)
                             link_list.add(link)
+
             self.url_list.extend(list(link_list))
 
         if self.tendency == "progressivism":
             for i in range(3):
                 await getLinks(self.progressiveArticle[self.progressive[i]], i)
 
-            for i in range(len(self.url_list)):
-                link = self.url_list[random.randint(0, len(self.url_list) - 1)]
-                await getInfo(link)
-                self.url_list.remove(link)
+            # print("url_list",self.url_list)
 
-        elif self.status == "conservatism":
+            for li in range(len(self.url_list)):
+                link = self.url_list[random.randint(0, len(self.url_list) - 1)]
+                i=0
+                if link.find("/arti/politics/") > -1:
+                    i=0
+                elif link.find("khan_art_view") > -1:
+                    i=1
+                elif link.find("/NWS_Web/View") > -1:
+                    i=2
+                html = await self.url_connection(link, i)
+                await getInfo(link, html)
+                self.url_list.remove(link)
+            print("url_list", self.url_list)
+
+        elif self.tendency == "conservatism":
             for i in range(3):
                 await getLinks(self.conservativeArticle[self.conservative[i]], i)
 
             for i in range(len(self.url_list)):
+                print("list",self.url_list)
                 link = self.url_list[random.randint(0, len(self.url_list) - 1)]
-                await getInfo(link)
+                i = None
+                if link.find("Politics") > -1:
+                    i = 0
+                elif link.find("/article/") > -1:
+                    i = 1
+                elif link.find("/site") > -1:
+                    i = 2
+                html = await self.url_connection(link, i)
+                await getInfo(link, html)
                 self.url_list.remove(link)
+
+    async def url_connection(self,link,i):
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        }
+        async with aiohttp.ClientSession(headers=headers) as client:
+        # async with aiohttp.ClientSession() as client:
+            html = await self.fetch(client, link, i)
+        return html
