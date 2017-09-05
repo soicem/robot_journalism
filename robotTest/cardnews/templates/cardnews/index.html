@@ -1,54 +1,178 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test용</title>
+    <title>NewSite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="{%static 'css/cardnews.css'%}">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        var news_article = "";
+
+        /* 불투명 배경 레이어 뛰우기 */
+        function opacity_bg_layer() {
+            if(!$('.opacity_bg_layer').length) {
+                $('<div class="opacity_bg_layer"></div>').appendTo($('body'));
+            }
+
+            var oj = $(".opacity_bg_layer");
+
+            // 화면의 가로, 세로 알아내기
+            var w = $(document).width();
+            var h = $(document).height();
+
+            oj.css({'width':w,'height':h}); // 불투명 배경 레이어 크기 설정
+            oj.fadeIn(500); // 불투명 배경 레이어 보이기 속도
+
+        }
+
+        /* 레이어 생성
+         cls : class
+         cont : 내용
+         기본 : 숨기기
+         */
+        function layer_pop_crt(cls, content) {
+            if(!cls) return false;
+            if(!$(cls).length) {
+
+                var newsdata = content.split("+");
+
+//                $('body').after($('<div class="' + cls + '"><div id="close">close</div><div id="viewer_news"><div id="conbox2"><table id="tbbox"  ><tr><td>' +
+//                    '"' + newsdata[0]+ '"</td></tr></table></div></div></div></div>'));
+//
+                $('<div class="' + cls + '"><div id="close">close</div><div id="viewer_news"><div id="conbox2"><table id="tbbox"  ><tr><td>' +
+                    '"' + newsdata[0]+ '"</td></tr></table></div></div></div></div>').appendTo($('body'));
+
+//                $('#tbbox').attr("background",newsdata[1]);
+//                $('#tbbox').background(newsdata[1]);
+
+//                document.getElementById("tbbox").setAttribute("background",newsdata[1]);
+                if (document.getElementById("tbbox").background == null){
+                    document.getElementById("tbbox").setAttribute("background",newsdata[1]);
+                }
+                if(!cls) {
+                    removeTag(cls);
+                    newsdata = null;
+                };
+//                content = [];
+            }
+
+            return true;
+        }
+
+        /* 레이어 띄우기
+         oj : 레이어 객체
+         */
+        function layer_pop_center(oj) {
+            if(!oj.length) return false;
+            oj.layer_pop_center_set();
+        }
+
+        function set_newsdata(data){
+            news_article = data;
+        }
+
+        function get_newsdata(){
+            return news_article;
+        }
+
+        /* 레이어 팝업 위치 설정 */
+        $.fn.layer_pop_center_set = function () {
+            this.css("top", ($(window).height() - $(this).outerHeight())/2);
+            this.css("left", ($(window).width() - $(this).outerWidth())/2);
+            return this;
+        }
+
+        /* 레이어 닫기 후 삭제
+         oj : 레이어 객체
+         */
+        function layer_pop_close(oj) {
+            if(oj.length) {
+                oj.fadeOut(500, function() {
+                    oj.remove();
+                });
+            }
+
+            // 불투명 배경 레이어 삭제
+            var oj = $('.opacity_bg_layer');
+            if(oj.length) {
+                oj.fadeOut(500, function() {
+                    oj.remove();
+                });
+            }
+        }
+
+        /* 화면을 불러온 후 처리 */
+        $(document).ready(function() {
+            var ly = 'layer_pop_center';
+            var _ly;
+            var ly_bg = $('.opacity_bg_layer');
+
+            $(document).on('click', '.news_data', function() { // 레이어 팝업 띄우기
+                if(!ly_bg.length) opacity_bg_layer(); // 불투명 배경 레이어 띄우기
+                if(layer_pop_crt(ly, get_newsdata())) {
+                    _ly = $('.' + ly); // 레이어 팝업 생성 후 재 선언
+                    layer_pop_center(_ly);
+                    _ly.fadeIn(500);
+                } else {
+                    if(ly_bg.length) ly_bg.remove();
+                }
+            });
+
+            $(document).on('click', '#close', function() {
+                layer_pop_close(_ly);
+            });
+        });
+
+        // 브라우저 창 크기 변경에 따른 처리
+        $(window).resize(function() {
+            var oj = $('.layer_pop_center');
+            if(oj.length) layer_pop_center(oj); // 레이어 팝업이 실행된 상태에서만 진행
+            if($('.opacity_bg_layer').length) opacity_bg_layer(); // 불투명 배경 레이어가 실행된 상태에서만 진행
+        });
+    </script>
 </head>
 <body>
-<div >
-    <div>
-        <form action="a/" method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            {{ form }}
-            <label for="keyword">keyword: </label>
-            <input id="keyword" type="text" name="keyword" value="{{ current_keyword }}">
-            <label for="tendency">tendency: </label>
-            <input id="tendency" type="text" name="tendency" value="{{ current_tendency }}">
-            <input type="submit" value="OK">
-        </form>
+<div class="container">
+    <div class="page-header">
+        <h1>News-Making Site</h1>
     </div>
-
-    <table align="center">
-        <thead>
-        <tr align="center">
-            <td><B>id</B></td>
-            <td><B>tendency</B></td>
-            <td><B>title</B></td>
-            <td><B>target</B></td>
-            <td><B>article</B></td>
-            <td><B>articleUrl</B></td>
-            <td><B>publish_time</B></td>
-            <td><B>collecting_time</B></td>
-        </tr>
-
-
-        </thead>
-        <tbody>
-        {%for newsdata in news_datas %}
-        <tr align="center">
-            <td>{{newsdata.id}}</td>
-            <td>{{newsdata.tendency}}</td>
-            <td>{{newsdata.title}}</td>
-            <td>{{newsdata.target}}</td>
-            <td>{{newsdata.article}}</td>
-            <td>{{newsdata.articleUrl}}</td>
-            <td>  {{newsdata.publish_time}}   </td>
-            <td>  {{newsdata.collecting_time}}  </td>
-        </tr>
-        {% endfor %}
-        <tbody>
-    </table>
+    <div class="contents">
+        {% if news_datas %}
+        {% for news_data in news_datas %}
+        {% if news_data.imgUrl %}
+        <img src="{{news_data.imgUrl}}" id = "{{news_data.imgUrl}}">
+        {%endif%}
+        <div class="news_data" id = "{{news_data.article}}+{{news_data.imgUrl}}"  value ="{{news_data.imgUrl}}" onclick="set_newsdata(id)" >{{news_data.title}}</div>
+        {%endfor%}
+        {% else %}
+        <div id="welcom" align="center">Welcome!</div>
+        {%endif%}
+    </div>
+    <div class="sidebar">
+        <!-- sidebar 영역 -->
+        <h2 class="bottom_padding" >Search</h2>
+        <div class="container">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="bottom_padding">
+                    {{form.keyword}}
+                </div>
+                <div class="bottom_padding">
+                    {{form.tendency}}
+                </div>
+                <input type="submit" value="Submit" class="bt" style="width: 175px" >
+            </form>
+        </div>
+    </div> <!-- sidebar end -->
 </div>
 </body>
 </html>
