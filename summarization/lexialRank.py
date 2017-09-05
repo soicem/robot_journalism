@@ -11,44 +11,52 @@ class LexRankforSummarization():
 
     def test_summarized(self, text):
         self.lexrank.summarize(text)
-        summaries = self.lexrank.probe(3)
-        #self.assertEqual(len(summaries), 4)
+        try:
+            summaries = self.lexrank.probe(3)
+        except:
+            summaries = self.lexrank.probe(2)
         result = []
         for summary in summaries:
             result.append(summary)
+        # print("result",result)
         return result
-
 
 @clock('{name}({args}) dt={elapsed:0.3f}s')
 def getSummarizedArticleUsingLexialRank(keyword, tendency):
     mq = mysqlDB()
-    titles = ''
+    titles = []
+    titleSet = ''
     for title in mq.getTitleData(keyword, tendency):
         title = title[0]
-        titles += title + ".  "
-    # print("----", titles)
+        titles.append(title)
+        titleSet += title + '.  '
     LRS = LexRankforSummarization()
-    summaries = LRS.test_summarized(titles)
+    # print("title",titleSet)
+    summaries = LRS.test_summarized(titleSet)
     selectedArticles = []
     summarizedArticles = []
-    # print("summaries -----", summaries)
-    cnt = 0
+    imgs = []
+    article_urls = []
+
+    print("summaries", summaries)
+
     for summary in summaries:
-        article = mq.getArticleData(summary[1:]) # summary[0] = ' '
-        article = article[0][0]
-        article = ((article.replace('.', '.  ')).replace('·', ' ')).strip()
-        selectedArticles.append(article)
-        s = "C:/Users/soicem/Desktop/robot_journalism/summarization/%d.txt"
+        # article = mq.getArticleData(summary.strip()) # summary[0] = ' '
+        contents = mq.getArticleData(summary.strip())  # summary[0] = ' '
+        try:
+            article = contents[0][0]
+            img = contents[0][1]
+            article = ((article.replace('.', '.  ')).replace('·', ' ')).strip()
+            selectedArticles.append(article)
+            imgs.append(img)
+        except:
+            print("일치하는 제목이없습니다.")
 
-        cnt += 1
-        with open(s%cnt, 'w') as f:
-            f.write(article)
+    print("selectedArticles", selectedArticles)
 
-    # print("-------------------selectedArticles", selectedArticles)
     for selectedArticle in selectedArticles:
         summarizedArticle = LRS.test_summarized(selectedArticle)
-        # print(summarizedArticle)
         summarizedArticles.append(summarizedArticle )
-    print(summarizedArticles)
-    return summarizedArticles
+    return summarizedArticles, summaries,imgs
+    # return summarizedArticles, titles
 
