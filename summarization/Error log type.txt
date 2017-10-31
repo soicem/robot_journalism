@@ -1,0 +1,7 @@
+write the type of error in summarization code into this text !
+
+E1. collected article content's length is less than 3
+- probe() in LExRankforSummarizeation class's method parameter is 3.  must be length of collected article content's length is more than 3
+
+E2. collected article count is not enough # not defined
+ 
