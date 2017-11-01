@@ -8,3 +8,4 @@ def crawlingWeb(result):
     ar = Article(keyword, tendency)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(ar.gathering(loop))
+

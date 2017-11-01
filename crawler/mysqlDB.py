@@ -2,6 +2,29 @@
 # import time
 #
 #
+# DROP TABLE IF EXISTS articles;
+# create table articles (
+#  	_id int not null auto_increment primary key,
+#      tendency varchar(20) not null,
+#      keyword varchar(20) not null,
+#      title varchar(100),
+#     target varchar(30) not null,
+#     article TEXT,
+#     articleUrl varchar(200) not null,
+#     imgUrl varchar(200) not null,
+#     publish_time datetime,
+#     collecting_time datetime
+# );
+# DROP TABLE IF EXISTS summarizedArticles;
+#  create table summarizedArticles (
+#  	  _id int not null auto_increment primary key,
+#      tendency varchar(20) not null,
+#      keyword varchar(20) not null,
+#      title varchar(100),
+#      summurizedArticle TEXT,
+#      imgUrl varchar(200) not null,
+#      generatedtime datetime
+#  );
 # #키스페이스
 # KEYSPACE = "robotjournalism"
 #
@@ -91,14 +114,15 @@ class mysqlDB:
         now = time.localtime()
         title = title.strip()
         s = self.datatimeFormat  % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-        sql = "insert into articles1 values(null,%s,%s,%s,%s,%s,%s,%s,%s,%s)" #위 sql문 오류나서
+        sql = "insert into articles values(null,%s,%s,%s,%s,%s,%s,%s,%s,%s)" #위 sql문 오류나서
+
         self.curs.execute(sql,(tendency, keyword, title, target, article, articleUrl, imgUrl,published_time,s))
         self.conn.commit()
 
     def insertDataIntoSummarizedArticles(self, tendency, keyword, title,  summerizedArticle, imgUrl):
         now = time.localtime()
         s = self.datatimeFormat % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour, now.tm_min, now.tm_sec)
-        sql = "insert into summarizedArticles1 values(null,%s,%s,%s,%s,%s,%s)"
+        sql = "insert into summarizedArticles values(null,%s,%s,%s,%s,%s,%s)"
         self.curs.execute(sql,(tendency, keyword, title, summerizedArticle, imgUrl, s))
         self.conn.commit()
 
@@ -122,26 +146,26 @@ class mysqlDB:
             conditionTime = self.datatimeFormat % (now.tm_year, now.tm_mon, now.tm_mday, now.tm_hour - 1, now.tm_min, now.tm_sec)
 
         print("conditionTime",conditionTime)
-        sql = "select title from articles1 where keyword = %s and tendency=%s and collecting_time > %s;"
+        sql = "select title from articles where keyword = %s and tendency=%s and collecting_time > %s;"
         self.curs.execute(sql, (keyword, tendency, conditionTime))
         rows = self.curs.fetchall()
         return rows
 
     def getArticleData(self, title):
-        # sql = "select article from articles1 where title=%s"
-        sql = "select article,imgUrl from articles1 where title=%s"
+        # sql = "select article from articles where title=%s"
+        sql = "select article,imgUrl from articles where title=%s"
         self.curs.execute(sql, (title))
         rows = self.curs.fetchall()
         return rows
 
     # def getArticle_Image(self, title):
-    #     sql = "select (article,imgUrl) from articles1 where title=%s"
+    #     sql = "select (article,imgUrl) from articles where title=%s"
     #     self.curs.execute(sql, (title))
     #     rows = self.curs.fetchall()
     #     return rows
     #
     # def getImgData(self, title):
-    #     sql = "select imgUrl from articles1 where title=%s"
+    #     sql = "select imgUrl from articles where title=%s"
     #     self.curs.execute(sql, (title))
     #     rows = self.curs.fetchall()
     #     return rows

@@ -26,9 +26,7 @@ def makeSummarizedArticle(result):
     mq = mysqlDB()
     summarizedArticles = []
     bufArticles, titles, imgUrls = getSummarizedArticleUsingLexialRank(keyword, tendency)
-    # print("titl",titles)
-    # print("imgs",imgs)
-    # bufArticles, titles =getSummarizedArticleUsingLexialRank(keyword, tendency)
+
     titleCnt = 0
     for summarizedArticle3 in bufArticles:
         buf = summarizedArticle3[0]

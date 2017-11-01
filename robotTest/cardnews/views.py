@@ -21,6 +21,7 @@ def index(request):
             cardnews_articles = newsdatas_list[1][2:].split('##')
             cardnews_imgUrls = newsdatas_list[2][2:].split('##')
 
+
             for i in range(len(newsdatas_list)):
                 news_data = cardnews(title=cardnews_titles[i], article=cardnews_articles[i], imgUrl=cardnews_imgUrls[i])
                 news_data.save()
